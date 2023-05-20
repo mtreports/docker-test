@@ -1,32 +1,27 @@
-name: Deploy to AWS
-
+name: Deploy React to AWS
 on:
   push:
     branches:
-      - master
+    - master
 
 jobs:
-  deploy:
-    runs-on: linux
-
+  build:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
 
-      - name: Set up AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_ID }}
-          aws-region: us-south-1
+    - name: Checkout source code
+      uses: actions/checkout@v2
 
-      - name: Install and build dependencies
-        run: |
-          npm install
-          npm run build
+    - name: Generate deployment package
+      run: zip -r deploy.zip . -x '*.git*'
 
-      - name: Deploy to AWS Elastic Beanstalk
-        run: |
-          aws elasticbeanstalk create-application-version --application-name testreports --version-label ${{ github.sha }} --source-bundle S3Bucket=elasticbeanstalk-ap-south-1-529973900162,S3Key=my-app.zip
-          aws elasticbeanstalk update-environment --environment-name Testreports-env --version-label ${{ github.sha }}
-
+    - name: Deploy to EB
+      uses: einaregilsson/beanstalk-deploy@v21
+      with:
+        aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY_ID }}
+        application_name: testreports
+        environment_name: Testreports-env
+        version_label: ${{ github.sha }}
+        region: ap-south-1
+        deployment_package: deploy.zip
