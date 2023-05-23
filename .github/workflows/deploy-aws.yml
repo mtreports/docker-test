@@ -26,4 +26,3 @@ jobs:
         existing_bucket_name: elasticbeanstalk-ap-south-1-529973900162
         region: ap-south-1
         deployment_package: deploy.zip
-        
