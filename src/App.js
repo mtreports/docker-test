@@ -15,7 +15,7 @@ function App() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Well come in Mt reports
+          Well come in Mt
         </a>
       </header>
     </div>
